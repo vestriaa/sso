@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Oculus SSO Redirect</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    input, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Oculus SSO Link Builder</h2>
+  <input type="text" id="redirectInput" placeholder="Enter Redirect URL" required>
+  <input type="text" id="orgInput" placeholder="Enter Organization ID" required>
+  <button onclick="redirectToSSO()">Go to SSO</button>
+</div>
+
+<script>
+function redirectToSSO() {
+  const redirectUrl = encodeURIComponent(document.getElementById('redirectInput').value.trim());
+  const orgId = encodeURIComponent(document.getElementById('orgInput').value.trim());
+
+  if (!redirectUrl || !orgId) {
+    alert('Please fill in both fields.');
+    return;
+  }
+
+  const fullUrl = `https://auth.oculus.com/sso/?redirect_uri=${redirectUrl}&organization_id=${orgId}`;
+  window.location.href = fullUrl;
+}
+</script>
+
+</body>
+</html>
