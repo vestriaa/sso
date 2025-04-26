@@ -46,6 +46,21 @@
 </div>
 
 <script>
+function checkAndDecodeHash() {
+  const hash = window.location.hash.substring(1); // remove the '#' at the start
+  if (hash) {
+    try {
+      const decoded = atob(hash);
+      console.log("Decoded base64 from URL hash:", decoded);
+    } catch (e) {
+      console.error("Failed to decode base64 from hash:", e);
+    }
+
+    // Remove the hash without reloading
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+}
+
 function redirectToSSO() {
   const redirectUrl = encodeURIComponent(document.getElementById('redirectInput').value.trim());
   const orgId = encodeURIComponent(document.getElementById('orgInput').value.trim());
@@ -58,6 +73,9 @@ function redirectToSSO() {
   const fullUrl = `https://auth.oculus.com/sso/?redirect_uri=${redirectUrl}&organization_id=${orgId}`;
   window.location.href = fullUrl;
 }
+
+// Run check immediately on page load
+checkAndDecodeHash();
 </script>
 
 </body>
