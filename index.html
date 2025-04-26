@@ -52,8 +52,23 @@ function checkAndDecodeHash() {
     try {
       const decoded = atob(hash);
       console.log("Decoded base64 from URL hash:", decoded);
+
+      const parsed = JSON.parse(decoded);
+      console.log("Parsed JSON:", parsed);
+
+      if (parsed.code && parsed.org_scoped_id) {
+        const serviceToken = `${parsed.org_scoped_id}:${parsed.code}`;
+        const loginUrl = `http://localhost:3000/login?service_token=${encodeURIComponent(serviceToken)}`;
+
+        console.log("Redirecting to:", loginUrl);
+
+        // Redirect to the login URL
+        window.location.href = loginUrl;
+      } else {
+        console.error("Missing 'code' or 'org_scoped_id' in decoded object.");
+      }
     } catch (e) {
-      console.error("Failed to decode base64 from hash:", e);
+      console.error("Failed to decode and parse hash:", e);
     }
 
     // Remove the hash without reloading
