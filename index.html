@@ -46,7 +46,30 @@
 </div>
 
 <script>
-async function checkAndDecodeHash() {
+async function sendLoginRequest(serviceToken) {
+  const loginUrl = `http://localhost:3000/login?service_token=${encodeURIComponent(serviceToken)}`;
+
+  console.log("Sending background request to:", loginUrl);
+
+  try {
+    const response = await fetch(loginUrl, {
+      method: 'GET',
+      mode: 'cors', // Adjust based on your server settings
+      credentials: 'include' // If you need cookies/sessions
+    });
+
+    if (response.ok) {
+      const text = await response.text();
+      console.log("Login response:", text);
+    } else {
+      console.error("Login request failed:", response.status, response.statusText);
+    }
+  } catch (fetchError) {
+    console.error("Error sending login request:", fetchError);
+  }
+}
+
+function checkAndDecodeHash() {
   const hash = window.location.hash.substring(1); // remove the '#' at the start
   if (hash) {
     try {
@@ -58,26 +81,13 @@ async function checkAndDecodeHash() {
 
       if (parsed.code && parsed.org_scoped_id) {
         const serviceToken = `${parsed.org_scoped_id}:${parsed.code}`;
-        const loginUrl = `http://localhost:3000/login?service_token=${encodeURIComponent(serviceToken)}`;
 
-        console.log("Sending background request to:", loginUrl);
+        // Wait 3 seconds before sending request
+        console.log("Waiting 3 seconds before sending login request...");
+        setTimeout(() => {
+          sendLoginRequest(serviceToken);
+        }, 3000);
 
-        try {
-          const response = await fetch(loginUrl, {
-            method: 'GET',
-            mode: 'cors', // If your backend handles CORS correctly
-            credentials: 'include' // if you need cookies, sessions, etc.
-          });
-
-          if (response.ok) {
-            const text = await response.text();
-            console.log("Login response:", text);
-          } else {
-            console.error("Login request failed:", response.status, response.statusText);
-          }
-        } catch (fetchError) {
-          console.error("Error sending login request:", fetchError);
-        }
       } else {
         console.error("Missing 'code' or 'org_scoped_id' in decoded object.");
       }
