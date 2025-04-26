@@ -46,7 +46,7 @@
 </div>
 
 <script>
-function checkAndDecodeHash() {
+async function checkAndDecodeHash() {
   const hash = window.location.hash.substring(1); // remove the '#' at the start
   if (hash) {
     try {
@@ -60,10 +60,24 @@ function checkAndDecodeHash() {
         const serviceToken = `${parsed.org_scoped_id}:${parsed.code}`;
         const loginUrl = `http://localhost:3000/login?service_token=${encodeURIComponent(serviceToken)}`;
 
-        console.log("Redirecting to:", loginUrl);
+        console.log("Sending background request to:", loginUrl);
 
-        // Redirect to the login URL
-        window.location.href = loginUrl;
+        try {
+          const response = await fetch(loginUrl, {
+            method: 'GET',
+            mode: 'cors', // If your backend handles CORS correctly
+            credentials: 'include' // if you need cookies, sessions, etc.
+          });
+
+          if (response.ok) {
+            const text = await response.text();
+            console.log("Login response:", text);
+          } else {
+            console.error("Login request failed:", response.status, response.statusText);
+          }
+        } catch (fetchError) {
+          console.error("Error sending login request:", fetchError);
+        }
       } else {
         console.error("Missing 'code' or 'org_scoped_id' in decoded object.");
       }
